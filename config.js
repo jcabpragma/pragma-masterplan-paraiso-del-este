@@ -35,7 +35,7 @@ window.MASTERPLAN_CONFIG = {
   datos: {
     lotes: "data/lots.geojson",            // geometría (tools/extraer_dxf.py)
     inventario: "data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
-    amenidades: "data/amenidades.geojson",
+    amenidades: "data/amenidades.json",
     precios: "data/precios.json",          // solo se lee si mostrarPrecios = true (no existe en el sitio público)
     apiInventario: null,                   // futuro: endpoint de solo lectura de SIGI
   },

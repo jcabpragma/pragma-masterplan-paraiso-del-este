@@ -9,7 +9,7 @@ js/app.js             lógica (mapa, filtros por estado y etapa, tarjeta, ficha)
 css/styles.css        estilos (marca Pragma: #0B3B33 / #003527, Inter)
 data/lots.geojson     geometría de los 1.379 lotes (WGS84) — generada por tools/extraer_dxf.py
 data/inventario.json  estado / m² / tipología por código — generado por tools/merge_inventario.py (SIN precios)
-data/amenidades.geojson  pines de amenidades (vacío: ver "Amenidades")
+data/amenidades.json  pines de amenidades (vacío: ver "Amenidades")
 tools/                scripts de extracción, merge y pruebas
 privado/              (NO se sube: .gitignore) precios, geometría UTM, reportes
 ```
@@ -78,7 +78,7 @@ La tarjeta mostrará `RD$ X/m²` y «Total estimado» (m² × precio, marcado *e
 
 ## 5. Amenidades
 Solo se ponen pines rotulados en el DXF. Los únicos rótulos encontrados (Paisaje, torres eléctricas, calles) están en el
-trazado `DS_1`, que no coincide con los lotes, así que `data/amenidades.geojson` queda vacío hasta tener el plano completo.
+trazado `DS_1`, que no coincide con los lotes, así que `data/amenidades.json` queda vacío hasta tener el plano completo.
 Formato: `Point [lng, lat]` con `nombre`, `descripcion`.
 
 ## 6. Pruebas
