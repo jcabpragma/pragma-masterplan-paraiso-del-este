@@ -162,4 +162,3 @@ path.lote{transition:fill-opacity .15s}
 .precio-consulta{font-size:14px!important;color:#205810!important}
 .tag{background:#EEF5EA!important;color:#205810!important}
 .btn--ghost{background:#EEF5EA;color:#205810}
-@media (min-width:900px){.card{left:auto;right:18px;top:auto;bottom:18px;height:auto;max-height:calc(100% - 40px);width:380px;border-radius:18px}}
