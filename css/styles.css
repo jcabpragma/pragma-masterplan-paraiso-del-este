@@ -221,3 +221,11 @@ path.lote{transition:fill-opacity .15s}
 
 /* pines de amenidades solo desde CFG.plano.zoomAmenidades */
 .sin-amenidades .amenity-pin { display: none; }
+
+/* v8: selector de mapa base Satélite | Mapa. Móvil: arriba-der (la tarjeta es hoja inferior). Escritorio: arriba-izq (la tarjeta flota arriba-der). Zoom abajo-der, leyenda abajo-izq */
+.fondo-sel{position:absolute;top:10px;right:10px;z-index:800;display:flex;padding:3px;gap:2px;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 3px 10px rgba(0,0,0,.18);backdrop-filter:blur(6px);font-family:Inter,system-ui,sans-serif}
+.fondo-sel button{appearance:none;border:0;background:transparent;color:var(--secundario);font:600 12px/1 Inter,system-ui,sans-serif;padding:7px 12px;border-radius:999px;cursor:pointer;min-height:30px;-webkit-tap-highlight-color:transparent}
+.fondo-sel button[aria-pressed="true"]{background:var(--primario);color:#fff}
+.fondo-sel button:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+@media (min-width:900px){.fondo-sel{top:14px;left:14px;right:auto}.fondo-sel button{font-size:13px;padding:8px 14px}}
+#map.fondo-mapa{background:#ECEAE4}

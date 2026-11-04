@@ -5,6 +5,8 @@
   var $ = function (s) { return document.querySelector(s); };
   var estadoActivo = "todos", etapaActiva = "todas";
   var lotes = [], capas = {}, seleccionado = null, map, precios = {};
+  var fondoActual = "satelite", fondoK = 0, conNitido = false, conOculto = false, capasFondo = [], capaLimite = null, capasManzana = [];
+  var CLAVE_FONDO = "pragma-masterplan-fondo";
 
   // ---------- Marca / tema ----------
   var root = document.documentElement.style;
@@ -72,13 +74,13 @@
   // ---------- Mapa ----------
   function iniciarMapa() {
     map = L.map("map", { zoomControl: true, zoomSnap: 0.25, maxZoom: 21 });
-    var opTes = { maxZoom: 21, maxNativeZoom: CFG.plano.maxZoomNativo || 19, attribution: CFG.plano.atribucion };
-    L.tileLayer(CFG.plano.teselas, opTes).addTo(map);   // fondo (entorno)
     var ent = CFG.entorno || {}, k = ent.difuminado ? Math.max(0, Math.min(1, ent.intensidad == null ? 1 : ent.intensidad)) : 0;
-    // intensidad 1 = desenfoque 2.5px, 20% menos color, 13% más oscuro. difuminado:false = satélite normal.
-    map.getContainer().style.setProperty("--entorno-filtro", k ? "blur(" + (2.5 * k).toFixed(2) + "px) saturate(" + (1 - 0.2 * k).toFixed(2) + ") brightness(" + (1 - 0.13 * k).toFixed(2) + ")" : "none");
     map.createPane("nitido"); map.getPane("nitido").style.zIndex = 210; map.getPane("nitido").style.pointerEvents = "none";
     map.createPane("oculto"); map.getPane("oculto").style.zIndex = 205; map.getPane("oculto").style.pointerEvents = "none";
+    map.createPane("ocultoRecorte", map.getPane("oculto"));   // recorte en el pane interior, desenfoque en el exterior (borde suave)
+    fondoK = k;
+    ponerFondo(fondoGuardado());
+    dibujarSelectorFondo();
     map.zoomControl.setPosition("bottomright");
     map.on("click", cerrarCard);
     map.createPane("manzanas"); map.getPane("manzanas").style.zIndex = 450; map.getPane("manzanas").style.pointerEvents = "none";
@@ -104,9 +106,9 @@
       precios = (res[4] && res[4].lotes) || {};
       mezclarInventario(res[3] || res[2]);
       encuadrar();
-      if (res[7] && k) aplicarMascara(res[7], opTes);
-      if ((CFG.zonasOcultas || []).length) zonasOcultas(CFG.zonasOcultas, opTes);      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
-      if (res[6]) L.geoJSON(res[6], { interactive: false, style: { color: "#FFFFFF", weight: 2, opacity: 0.85, dashArray: "6 6", fill: false } }).addTo(map);
+      if (res[7] && k) aplicarMascara(res[7]);
+      if ((CFG.zonasOcultas || []).length) zonasOcultas(CFG.zonasOcultas);      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
+      if (res[6]) capaLimite = L.geoJSON(res[6], { interactive: false, style: estiloLimite() }).addTo(map);
       if (res[5]) dibujarManzanas(res[5].features);
       dibujarLotes();
       dibujarAmenidades(res[1].features);
@@ -129,16 +131,63 @@
     actualizar();
   }
   // Entorno: fondo suavizado (CSS --entorno-filtro) y capa nítida recortada al límite del proyecto
-  function aplicarMascara(gj, opTes) {
-    L.tileLayer(CFG.plano.teselas, L.extend({ pane: "nitido", attribution: "" }, opTes)).addTo(map);
+  function aplicarMascara(gj) {
+    conNitido = true; ponerFondo(fondoActual);
     recortar(map.getPane("nitido"), [gj.geometry.coordinates[0].map(aLatLng)]);
     map.getContainer().classList.add("con-mascara");
   }
   // Zonas ocultas: imagen de baja resolución (z<=14) muy difuminada solo dentro de esos polígonos.
   // El recorte va en la capa y el desenfoque en el pane, así el borde queda suave.
-  function zonasOcultas(zonas, opTes) {
-    var capa = L.tileLayer(CFG.plano.teselas, L.extend({}, opTes, { pane: "oculto", attribution: "", maxNativeZoom: 14 })).addTo(map);
-    recortar(capa.getContainer(), zonas.map(function (z) { return z.map(function (c) { return L.latLng(c[0], c[1]); }); }));
+  function zonasOcultas(zonas) {
+    conOculto = true; ponerFondo(fondoActual);
+    recortar(map.getPane("ocultoRecorte"), zonas.map(function (z) { return z.map(function (c) { return L.latLng(c[0], c[1]); }); }));
+  }
+  // ---------- Mapa base: Satélite | Mapa ----------
+  // Satélite = CFG.plano.teselas (Esri). Mapa = OpenStreetMap estándar (sin API key; CARTO ya exige key). Se puede cambiar con CFG.plano.mapaCalles.
+  function fondos() {
+    return {
+      satelite: { nombre: "Satélite", url: CFG.plano.teselas, atribucion: CFG.plano.atribucion, maxNativo: CFG.plano.maxZoomNativo || 19 },
+      mapa: L.extend({ nombre: "Mapa", url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        atribucion: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores de OpenStreetMap</a>',
+        maxNativo: 19 }, CFG.plano.mapaCalles || {})
+    };
+  }
+  function fondoGuardado() {
+    var v = null; try { v = localStorage.getItem(CLAVE_FONDO); } catch (e) {}
+    return fondos()[v] ? v : "satelite";
+  }
+  function ponerFondo(clave) {
+    var f = fondos()[clave] || fondos().satelite, c = map.getContainer(), k = fondoK;
+    fondoActual = fondos()[clave] ? clave : "satelite";
+    capasFondo.forEach(function (l) { map.removeLayer(l); }); capasFondo = [];
+    var op = { maxZoom: 21, maxNativeZoom: f.maxNativo, subdomains: f.subdominios || "abc", detectRetina: false };
+    capasFondo.push(L.tileLayer(f.url, L.extend({ attribution: f.atribucion }, op)).addTo(map));          // fondo (entorno)
+    if (conNitido) capasFondo.push(L.tileLayer(f.url, L.extend({}, op, { pane: "nitido", attribution: "" })).addTo(map));
+    if (conOculto) capasFondo.push(L.tileLayer(f.url, L.extend({}, op, { pane: "ocultoRecorte", attribution: "", maxNativeZoom: 14 })).addTo(map));
+    // Satélite: intensidad 1 = desenfoque 2.5px, 20% menos color, 13% más oscuro. Mapa: más suave (sin desenfoque fuerte para no ensuciar calles).
+    var filtro = !k ? "none" : fondoActual === "mapa"
+      ? "blur(" + (0.6 * k).toFixed(2) + "px) saturate(" + (1 - 0.6 * k).toFixed(2) + ") brightness(" + (1 - 0.06 * k).toFixed(2) + ")"
+      : "blur(" + (2.5 * k).toFixed(2) + "px) saturate(" + (1 - 0.2 * k).toFixed(2) + ") brightness(" + (1 - 0.13 * k).toFixed(2) + ")";
+    c.style.setProperty("--entorno-filtro", filtro);
+    c.classList.toggle("fondo-mapa", fondoActual === "mapa");
+    if (capaLimite) capaLimite.setStyle(estiloLimite());
+    capasManzana.forEach(function (l) { l.setStyle(estiloManzana()); });
+    document.querySelectorAll(".fondo-sel button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-fondo") === fondoActual ? "true" : "false"); });
+  }
+  function estiloLimite() { return fondoActual === "mapa" ? { color: CFG.marca.colores.secundario, weight: 2, opacity: 0.8, dashArray: "6 6", fill: false } : { color: "#FFFFFF", weight: 2, opacity: 0.85, dashArray: "6 6", fill: false }; }
+  function estiloManzana() { return fondoActual === "mapa" ? { color: CFG.marca.colores.secundario, weight: 1.4, opacity: 0.55, fill: false } : { color: "#FFFFFF", weight: 1.4, opacity: 0.7, fill: false }; }
+  function dibujarSelectorFondo() {
+    var d = document.createElement("div");
+    d.className = "fondo-sel"; d.setAttribute("role", "group"); d.setAttribute("aria-label", "Tipo de mapa");
+    var fs = fondos();
+    d.innerHTML = ["satelite", "mapa"].map(function (k) { return '<button type="button" data-fondo="' + k + '" aria-pressed="' + (k === fondoActual) + '">' + esc(fs[k].nombre) + "</button>"; }).join("");
+    L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+    d.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-fondo]"); if (!b || b.getAttribute("data-fondo") === fondoActual) return;
+      ponerFondo(b.getAttribute("data-fondo"));
+      try { localStorage.setItem(CLAVE_FONDO, fondoActual); } catch (er) {}
+    });
+    map.getContainer().appendChild(d);
   }
   // Vista inicial: todo el proyecto, también en celular
   function encuadrar() {
@@ -186,7 +235,7 @@
   }
   function dibujarManzanas(feats) {
     feats.forEach(function (f) {
-      var capa = L.geoJSON(f, { pane: "manzanas", interactive: false, style: { color: "#FFFFFF", weight: 1.4, opacity: 0.7, fill: false } }).addTo(map);
+      var capa = L.geoJSON(f, { pane: "manzanas", interactive: false, style: estiloManzana() }).addTo(map); capasManzana.push(capa);
       var c = capa.getBounds().getCenter();
       L.marker(c, { pane: "manzanas", interactive: false, icon: L.divIcon({ className: "mz-label", html: "<span>M" + esc(f.properties.manzana) + "</span>", iconSize: [40, 20], iconAnchor: [20, 10] }) }).addTo(map);
     });

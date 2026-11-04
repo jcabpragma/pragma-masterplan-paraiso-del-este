@@ -128,3 +128,12 @@ Render Static Site conectado a este repo (rama `main`, publish path `.`, build `
   (`plano.zoomAmenidades`) para no tapar la vista general. AI-1/AI-3 y AA- no se usan (no está claro qué son). Calles: no se dibujan.
 - Inventario: 1.368 de 1.379 coinciden (sin cambio: los rótulos del DXF nuevo son los mismos). Siguen 11 solo en plano
   («No disponible · ej») y 12 solo en SIGI; ver `privado/reporte_merge.json`.
+
+## v8 (4 nov 2026): selector Satélite | Mapa
+- Botón segmentado «Satélite | Mapa» sobre el plano (móvil: arriba a la derecha; escritorio ≥900px: arriba a la izquierda, porque ahí la tarjeta del lote flota a la derecha). Usa `--primario`, así SDE sale en azul.
+- Satélite = `CFG.plano.teselas` (Esri World Imagery, `maxZoomNativo` por proyecto). Mapa = OpenStreetMap estándar `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, nativo hasta z19 y ampliado hasta z21 (sin teselas en blanco). Atribución «© colaboradores de OpenStreetMap». CARTO Voyager se descartó: ahora exige API key (marca de agua «API KEY REQUIRED»).
+- Para cambiar el mapa de calles por proyecto: `plano.mapaCalles: { url, atribucion, maxNativo, subdominios }` en `config.js`.
+- La elección se guarda en `localStorage["pragma-masterplan-fondo"]` (`satelite` | `mapa`); por defecto Satélite.
+- `ponerFondo()` (js/app.js) recrea las 3 capas de teselas (fondo, `nitido` recortado al límite, `ocultoRecorte` dentro de `oculto` para las zonas ocultas de SDE). Los recortes están en los panes, así no se duplican al cambiar.
+- Entorno en modo Mapa: desenfoque leve (0.6px) y menos color, para no ensuciar las calles. Límite y contornos de manzana pasan a color `secundario` (el blanco no se ve sobre el mapa claro).
+- Prueba: `python3 tools/captura_v8_fondo.py URL screenshots/live-v8` (PDE y SDE, 390x844 y 1280x800: por defecto, cambio, zoom máximo, tarjeta, recordar tras recargar, choques con filtros/zoom/leyenda/tarjeta, errores JS y teselas con error).
