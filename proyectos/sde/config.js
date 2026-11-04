@@ -1,29 +1,29 @@
 /*
- * CONFIGURACIÓN — Paraíso del Este. Único archivo a tocar para ajustes comerciales.
+ * CONFIGURACIÓN — Samanes del Este. Único archivo a tocar para ajustes comerciales.
  */
 window.MASTERPLAN_CONFIG = {
+  id: "sde",
   proyecto: {
-    nombre: "Paraíso del Este",
-    subtitulo: "Masterplan interactivo · Santo Domingo Este",
-    ubicacion: "Santo Domingo Este, República Dominicana",
-    logo: "assets/logo-paraiso-oscuro.png",      // versión para fondo oscuro (intro)
-    logoClaro: "assets/logo-paraiso.png",       // versión a color (encabezado claro)
-    fondoIntro: "assets/intro.jpg",
-    logoTexto: "Paraíso del Este",
+  sigla: "SDE",
+    nombre: "Samanes del Este",
+    subtitulo: "",
+    ubicacion: "",
+    logo: null, logoClaro: null,               // sin logo todavía: wordmark de texto
+    logoTexto: "Samanes del Este",
   },
 
   marca: {
     nombre: "PRAGMA CAPITAL",
     logo: "assets/logo-pragma-oscuro.png",
     logoClaro: "assets/logo-pragma.png",
-    colores: { primario: "#205810", secundario: "#123408", acento: "#70D860" },  // verdes del logo Paraíso del Este,
+    colores: { primario: "#205810", secundario: "#123408", acento: "#70D860" },  // misma paleta Pragma/PDE
     fuente: "Inter",
   },
 
   whatsapp: {
     numero: "18297623117",      // +1 (829) 762-3117 — ventas
     esEjemplo: false,
-    mensaje: "Hola, me interesa el lote {codigo} del proyecto {proyecto}",
+    mensaje: "Hola, me interesa el lote {codigo} de Samanes del Este",
   },
 
   // modo "geo": coordenadas reales [lng, lat] (WGS84) sobre imagen satelital.
@@ -32,17 +32,17 @@ window.MASTERPLAN_CONFIG = {
     teselas: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     atribucion: "Imágenes © Esri, Maxar, Earthstar Geographics",
     maxZoomNativo: 19,
-    zoomEtiquetas: 18.5,
-    zoomManzanas: 16.5,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
+    zoomEtiquetas: 18,
+    zoomManzanas: 16,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
   },
 
   datos: {
-    lotes: "data/lots.geojson",            // geometría (tools/extraer_dxf.py)
-    inventario: "data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
-    amenidades: "data/amenidades.json",
-    manzanas: "data/manzanas.json",
-    limite: "data/limite.json",
-    precios: "data/precios.json",          // solo se lee si mostrarPrecios = true (no existe en el sitio público)
+    lotes: "proyectos/sde/data/lots.geojson",            // geometría (tools/extraer_dxf.py)
+    inventario: "proyectos/sde/data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
+    amenidades: "proyectos/sde/data/amenidades.json",
+    manzanas: "proyectos/sde/data/manzanas.json",
+    limite: "proyectos/sde/data/limite.json",
+    precios: "proyectos/sde/data/precios.json",          // solo se lee si mostrarPrecios = true (no existe en el sitio público)
     apiInventario: null,                   // futuro: endpoint de solo lectura de SIGI
   },
 

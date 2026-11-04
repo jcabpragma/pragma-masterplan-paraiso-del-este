@@ -24,6 +24,7 @@
     <img src="assets/entrada.jpg" alt="Built with vision, operated with innovation! — Pragma Capital" width="1920" height="1080">
   </picture>
   <div class="intro__panel">
+    <nav class="proy-tabs proy-tabs--intro" aria-label="Proyecto"></nav>
     <div id="introLogo" class="intro__logo"></div>
     <button id="btnIngresar" class="btn btn--light btn--lg" type="button">Ingresar</button>
   </div>
@@ -39,11 +40,13 @@
       <img id="logoTop" class="topbar__logo" alt="">
       <strong id="tituloProyecto" class="sr-only"></strong>
     </div>
+    <nav class="proy-tabs" aria-label="Proyecto"></nav>
     <div class="topbar__by"><span>by</span><img id="marcaMini" alt=""></div>
   </header>
   <nav id="filtros" class="chips" aria-label="Filtrar por estado"></nav>
   <nav id="filtrosEtapa" class="chips chips--etapa" aria-label="Filtrar por etapa"></nav>
 
+  <div id="proximamente" class="proximo" hidden></div>
   <div id="map" class="map" aria-label="Plano del proyecto"></div>
 
   <div id="leyenda" class="legend"></div>
@@ -66,7 +69,7 @@
 </section>
 
 <script src="vendor/leaflet/leaflet.js"></script>
-<script src="config.js"></script>
+<script src="proyectos/proyectos.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

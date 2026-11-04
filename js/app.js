@@ -34,15 +34,36 @@
   // ---------- Intro ----------
   $("#introLogo").innerHTML = CFG.proyecto.logo
     ? '<img src="' + esc(CFG.proyecto.logo) + '" alt="' + esc(CFG.proyecto.nombre) + '">'
-    : esc(CFG.proyecto.logoTexto);
+    : '<span class="intro__nombre">' + esc(CFG.proyecto.logoTexto) + "</span>";
   $("#tituloProyecto").textContent = CFG.proyecto.nombre;
   $("#marcaMini").src = CFG.marca.logoClaro || CFG.marca.logo; $("#marcaMini").alt = CFG.marca.nombre;
-  $("#logoTop").src = CFG.proyecto.logoClaro || CFG.proyecto.logo; $("#logoTop").alt = CFG.proyecto.nombre;
+  if (CFG.proyecto.logoClaro || CFG.proyecto.logo) { $("#logoTop").src = CFG.proyecto.logoClaro || CFG.proyecto.logo; $("#logoTop").alt = CFG.proyecto.nombre; }
+  else { $("#logoTop").hidden = true; $("#tituloProyecto").classList.remove("sr-only"); }
 
-  $("#btnIngresar").addEventListener("click", function () {
-    $("#intro").hidden = true; $("#app").hidden = false;
-    if (!map) iniciarMapa(); else map.invalidateSize();
+  // ---------- Selector de proyecto (?p=pde / ?p=sde) ----------
+  var PROY = window.MASTERPLAN_PROYECTOS || [];
+  var qs = new URLSearchParams(location.search);
+  document.querySelectorAll(".proy-tabs").forEach(function (nav) {
+    nav.innerHTML = PROY.map(function (x) {
+      var act = x.id === CFG.id;
+      var dentro = nav.classList.contains("proy-tabs--intro") ? "" : "&ver=plano";
+      return '<a class="proy-tab" href="?p=' + x.id + dentro + '"' + (act ? ' aria-current="page"' : "") + '><b>' + esc(x.sigla) + '</b><span> · ' + esc(x.nombre) + "</span></a>";
+    }).join("");
   });
+  function entrar() {
+    $("#intro").hidden = true; $("#app").hidden = false;
+    if (CFG.proximamente) return mostrarProximamente();
+    if (!map) iniciarMapa(); else map.invalidateSize();
+  }
+  function mostrarProximamente() {
+    ["#filtros", "#filtrosEtapa", "#map", "#leyenda"].forEach(function (s) { $(s).hidden = true; });
+    $("#proximamente").hidden = false;
+    $("#proximamente").innerHTML = '<div class="proximo__box"><span class="proximo__pill">Próximamente</span><h1>' + esc(CFG.proyecto.nombre) + "</h1><p>" + esc(CFG.proyecto.nota || "Masterplan en preparación") + "</p>" +
+      '<a id="btnWA" class="btn btn--wa btn--lg" href="https://wa.me/' + CFG.whatsapp.numero + "?text=" + encodeURIComponent(CFG.whatsapp.mensaje) + '" target="_blank" rel="noopener">' + icoWA + "Escribir por WhatsApp</a></div>";
+    document.body.setAttribute("data-listo", "1");
+  }
+  $("#btnIngresar").addEventListener("click", entrar);
+  if (qs.get("ver") === "plano") entrar();
   $("#btnVolver").addEventListener("click", function () { cerrarCard(); $("#app").hidden = true; $("#intro").hidden = false; });
 
   function aLatLng(c) { return [c[1], c[0]]; }

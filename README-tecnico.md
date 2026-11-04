@@ -61,12 +61,12 @@ git add data/inventario.json && git commit -m "Inventario AAAA-MM-DD" && git pus
 - `data/inventario.json` **no contiene precios**. Los precios van a `privado/precios.json` (ignorado por git).
 - Reporte de coincidencias: `privado/reporte_merge.json`.
 
-Futuro: `config.js → datos.apiInventario` puede apuntar a un endpoint de solo lectura que devuelva el mismo formato
+Futuro: `proyectos/pde/config.js → datos.apiInventario` puede apuntar a un endpoint de solo lectura que devuelva el mismo formato
 (`{lotes: {codigo: {estado, m2, tipologia}}}` o lista con `codigo`); tiene prioridad sobre el JSON.
 
 ## 3. Precios (apagados)
 
-`config.js → mostrarPrecios: false`. Mientras esté en `false` la tarjeta dice «Precio: Consultar por WhatsApp» y el sitio
+`proyectos/pde/config.js → mostrarPrecios: false`. Mientras esté en `false` la tarjeta dice «Precio: Consultar por WhatsApp» y el sitio
 no lee ningún precio. Para activarlos cuando se apruebe la lista:
 1. `mostrarPrecios: true`;
 2. copiar `privado/precios.json` a `data/precios.json` (formato `{lotes: {codigo: {precio_m2, moneda}}}`) y quitar
@@ -74,7 +74,7 @@ no lee ningún precio. Para activarlos cuando se apruebe la lista:
 La tarjeta mostrará `RD$ X/m²` y «Total estimado» (m² × precio, marcado *estimado*).
 
 ## 4. WhatsApp
-`config.js → whatsapp.numero = "18297623117"` (+1 829 762-3117). Mensaje: «Hola, me interesa el lote {codigo} del proyecto Paraíso del Este».
+`proyectos/pde/config.js → whatsapp.numero = "18297623117"` (+1 829 762-3117). Mensaje: «Hola, me interesa el lote {codigo} del proyecto Paraíso del Este».
 
 ## 5. Amenidades
 Solo se ponen pines rotulados en el DXF. Los únicos rótulos encontrados (Paisaje, torres eléctricas, calles) están en el
@@ -100,3 +100,10 @@ Render Static Site conectado a este repo (rama `main`, publish path `.`, build `
   También genera `data/manzanas.json` (contornos) y `data/limite.json` (límite del proyecto).
 - **Marca**: logos en `assets/` (versión a color, `-oscuro` para fondos oscuros, `-blanco`). Paleta verde tomada del logo Paraíso del Este.
 - Flujo de actualización de geometría: `python3 tools/geometria_v2.py . && python3 tools/exportar_v2.py`.
+
+## v4: varios proyectos
+- `proyectos/proyectos.js`: lista de proyectos y selección por URL (`?p=pde`, `?p=sde`; `&ver=plano` salta la portada).
+- `proyectos/<id>/config.js` (+ `data/` y logos del proyecto). Compartido: `assets/` (foto de portada, logos Pragma), `js/`, `css/`.
+- SDE (Samanes del Este): `proyectos/sde/data/` se generó del DXF de Samanes (293 rótulos `M##-L` en capa 0 + 313 polilíneas cerradas
+  en capa 0 = contornos reales: 292/293 coinciden en área ±5 %; M16-L10 queda aproximado). UTM 19N → WGS84.
+  Sin inventario aún: todos «No disponible · ej». Al llegar el CSV se genera `proyectos/sde/data/inventario.json` igual que PDE.

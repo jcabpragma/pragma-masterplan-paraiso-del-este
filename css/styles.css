@@ -186,3 +186,28 @@ path.lote{transition:fill-opacity .15s}
   .intro__foto{width:min(100%,1100px,calc((100vh - 280px) * 16 / 9));margin:48px auto 0}
   .intro__foto img{border-radius:14px}
 }
+
+/* ================= v4 · varios proyectos ================= */
+.proy-tabs{display:flex;gap:4px;background:#EEF3EC;border-radius:999px;padding:3px}
+.proy-tab{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12.5px;color:#3D4C38;text-decoration:none;white-space:nowrap}
+.proy-tab b{font-weight:800;letter-spacing:.04em}
+.proy-tab[aria-current]{background:#205810;color:#fff;box-shadow:0 2px 8px rgba(18,52,8,.25)}
+.proy-tabs--intro{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(8px);pointer-events:auto}
+.proy-tabs--intro .proy-tab{color:#fff;padding:8px 14px;font-size:13px}
+.proy-tabs--intro .proy-tab[aria-current]{background:#fff;color:#123408}
+.intro__nombre{display:block;font-size:30px;font-weight:800;color:#fff;letter-spacing:-.01em;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.topbar__title strong{color:#123408;font-size:16px}
+.topbar{flex-wrap:wrap}
+@media (max-width:700px){
+  .topbar .proy-tabs{order:5;width:100%;justify-content:stretch}
+  .topbar .proy-tab{flex:1;justify-content:center}
+  .topbar .proy-tab span{display:none}
+}
+.proximo{flex:1;display:grid;place-items:center;padding:24px;background:radial-gradient(120% 90% at 50% 0%,#2E7A18 0%,#205810 40%,#123408 100%);color:#fff;text-align:center}
+.proximo__box{max-width:420px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.proximo__pill{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(112,216,96,.18);border:1px solid rgba(112,216,96,.6);color:#BFF2B3}
+.proximo h1{margin:0;font-size:32px;letter-spacing:-.02em}
+.proximo p{margin:0 0 10px;opacity:.85;font-size:15px}
+@media (min-aspect-ratio: 3/2) and (min-width: 701px){
+  .intro__panel .proy-tabs--intro{position:absolute;left:50%;top:28px;transform:translateX(-50%)}
+}
