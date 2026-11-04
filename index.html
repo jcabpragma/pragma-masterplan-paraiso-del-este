@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masterplan · Paraíso del Este</title>
+<meta name="description" content="Masterplan interactivo de Paraíso del Este: disponibilidad de lotes por etapa.">
+<meta name="theme-color" content="#003527">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Pantalla de entrada -->
+<section id="intro" class="intro" aria-label="Bienvenida">
+  <div id="introUbic" class="intro__badge intro__badge--ubic"></div>
+  <div class="intro__center">
+    <div id="introLogo" class="intro__logo"></div>
+    <p id="introSub" class="intro__sub"></p>
+    <button id="btnIngresar" class="btn btn--light btn--lg" type="button">Ingresar</button>
+  </div>
+  <div class="intro__foot">
+    <span class="intro__by">Desarrollado por</span>
+    <div id="introMarca" class="wordmark wordmark--light"></div>
+  </div>
+</section>
+
+<!-- Vista del plano -->
+<section id="app" class="app" hidden>
+  <header class="topbar">
+    <button id="btnVolver" class="icon-btn" type="button" aria-label="Volver">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="topbar__title">
+      <strong id="tituloProyecto"></strong>
+      <span id="marcaMini" class="topbar__brand"></span>
+    </div>
+  </header>
+  <nav id="filtros" class="chips" aria-label="Filtrar por estado"></nav>
+  <nav id="filtrosEtapa" class="chips chips--etapa" aria-label="Filtrar por etapa"></nav>
+
+  <div id="map" class="map" aria-label="Plano del proyecto"></div>
+
+  <div id="leyenda" class="legend"></div>
+
+  <!-- Tarjeta flotante / bottom sheet -->
+  <aside id="card" class="card" aria-live="polite" hidden>
+    <div class="card__grab"></div>
+    <button id="cardCerrar" class="card__close" type="button" aria-label="Cerrar">×</button>
+    <div id="cardBody"></div>
+  </aside>
+
+  <!-- Ficha del lote -->
+  <div id="ficha" class="modal" role="dialog" aria-modal="true" aria-labelledby="fichaTitulo" hidden>
+    <div class="modal__backdrop" data-cerrar></div>
+    <div class="modal__panel">
+      <button class="card__close" type="button" aria-label="Cerrar" data-cerrar>×</button>
+      <div id="fichaBody"></div>
+    </div>
+  </div>
+</section>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+privado/
+data/precios.json
+screenshots/
+__pycache__/
+*.dxf
+*.csv
