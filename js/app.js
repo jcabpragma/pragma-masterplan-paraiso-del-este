@@ -18,7 +18,7 @@
   // "ej" por lote: solo en lotes del plano que no tienen inventario de SIGI
   function ejTag(p) { return p && p.ejemplo ? '<span class="ej" title="Sin inventario confirmado">ej</span>' : ""; }
   function wordmark() {
-    if (CFG.marca.logo) return '<img src="' + esc(CFG.marca.logo) + '" alt="' + esc(CFG.marca.nombre) + '" height="22">';
+    if (CFG.marca.logo) return '<img src="' + esc(CFG.marca.logo) + '" alt="' + esc(CFG.marca.nombre) + '">';
     return '<span class="lam">Λ</span>' + esc(CFG.marca.nombre);
   }
   function num(v, d) { return Number(v).toLocaleString("en-US", { maximumFractionDigits: d == null ? 2 : d }); }
@@ -34,12 +34,14 @@
   // ---------- Intro ----------
   $("#introLogo").innerHTML = CFG.proyecto.logo
     ? '<img src="' + esc(CFG.proyecto.logo) + '" alt="' + esc(CFG.proyecto.nombre) + '">'
-    : '<span class="mark">' + esc(CFG.proyecto.logoTexto.charAt(0)) + "</span>" + esc(CFG.proyecto.logoTexto);
+    : esc(CFG.proyecto.logoTexto);
+  if (CFG.proyecto.fondoIntro) $("#intro").style.setProperty("--fondo-intro", 'url("' + CFG.proyecto.fondoIntro + '")');
   $("#introSub").textContent = CFG.proyecto.subtitulo;
   $("#introUbic").textContent = CFG.proyecto.ubicacion;
   $("#introMarca").innerHTML = wordmark();
   $("#tituloProyecto").textContent = CFG.proyecto.nombre;
-  $("#marcaMini").textContent = CFG.marca.nombre;
+  $("#marcaMini").src = CFG.marca.logoClaro || CFG.marca.logo; $("#marcaMini").alt = CFG.marca.nombre;
+  $("#logoTop").src = CFG.proyecto.logoClaro || CFG.proyecto.logo; $("#logoTop").alt = CFG.proyecto.nombre;
 
   $("#btnIngresar").addEventListener("click", function () {
     $("#intro").hidden = true; $("#app").hidden = false;
@@ -56,7 +58,12 @@
     L.tileLayer(CFG.plano.teselas, { maxZoom: 21, maxNativeZoom: CFG.plano.maxZoomNativo || 19, attribution: CFG.plano.atribucion }).addTo(map);
     map.zoomControl.setPosition("bottomright");
     map.on("click", cerrarCard);
-    function etiquetas() { map.getContainer().classList.toggle("sin-etiquetas", map.getZoom() < (CFG.plano.zoomEtiquetas || 18)); }
+    map.createPane("manzanas"); map.getPane("manzanas").style.zIndex = 450; map.getPane("manzanas").style.pointerEvents = "none";
+    function etiquetas() {
+      var z = map.getZoom(), c = map.getContainer();
+      c.classList.toggle("sin-etiquetas", z < (CFG.plano.zoomEtiquetas || 18));
+      c.classList.toggle("sin-manzanas", z < (CFG.plano.zoomManzanas || 16.5) || z >= (CFG.plano.zoomEtiquetas || 18));
+    }
     map.on("zoomend", etiquetas); etiquetas();
 
     Promise.all([
@@ -64,12 +71,16 @@
       getJSON(CFG.datos.amenidades).catch(function () { return { features: [] }; }),
       getJSON(CFG.datos.inventario).catch(function () { return null; }),
       cargarInventarioVivo(),
-      CFG.mostrarPrecios ? getJSON(CFG.datos.precios).catch(function () { return null; }) : Promise.resolve(null)
+      CFG.mostrarPrecios ? getJSON(CFG.datos.precios).catch(function () { return null; }) : Promise.resolve(null),
+      CFG.datos.manzanas ? getJSON(CFG.datos.manzanas).catch(function () { return null; }) : Promise.resolve(null),
+      CFG.datos.limite ? getJSON(CFG.datos.limite).catch(function () { return null; }) : Promise.resolve(null)
     ]).then(function (res) {
       lotes = res[0].features;
       precios = (res[4] && res[4].lotes) || {};
       mezclarInventario(res[3] || res[2]);
       encuadrar();      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
+      if (res[6]) L.geoJSON(res[6], { interactive: false, style: { color: "#FFFFFF", weight: 2, opacity: 0.85, dashArray: "6 6", fill: false } }).addTo(map);
+      if (res[5]) dibujarManzanas(res[5].features);
       dibujarLotes();
       dibujarAmenidades(res[1].features);
       dibujarFiltros(); dibujarLeyenda();
@@ -112,15 +123,23 @@
   }
 
   function visible(p) { return (estadoActivo === "todos" || p.estado === estadoActivo) && (etapaActiva === "todas" || p.etapa === etapaActiva); }
+  var OPAC = { disponible: 0.78, reservado: 0.72, vendido: 0.62, no_disponible: 0.32 };
   function estilo(p, activo) {
     var c = (CFG.estados[p.estado] || {}).color || "#999", oculto = !visible(p);
     return {
-      color: activo ? "#FFFFFF" : (oculto ? "#ffffff" : "#0B3B33"),
-      weight: activo ? 4 : 1,
+      color: "#FFFFFF",
+      weight: activo ? 3 : 0.9,
       fillColor: c,
-      fillOpacity: oculto ? 0.06 : (activo ? 0.98 : 0.82),
-      opacity: oculto ? 0.25 : 0.9
+      fillOpacity: oculto ? 0.04 : (activo ? 0.95 : (OPAC[p.estado] || 0.6)),
+      opacity: oculto ? 0.12 : (activo ? 1 : 0.55)
     };
+  }
+  function dibujarManzanas(feats) {
+    feats.forEach(function (f) {
+      var capa = L.geoJSON(f, { pane: "manzanas", interactive: false, style: { color: "#FFFFFF", weight: 1.4, opacity: 0.7, fill: false } }).addTo(map);
+      var c = capa.getBounds().getCenter();
+      L.marker(c, { pane: "manzanas", interactive: false, icon: L.divIcon({ className: "mz-label", html: "<span>M" + esc(f.properties.manzana) + "</span>", iconSize: [40, 20], iconAnchor: [20, 10] }) }).addTo(map);
+    });
   }
 
   function dibujarLotes() {
@@ -128,7 +147,7 @@
       var p = f.properties;
       var capa = L.polygon(f.geometry.coordinates[0].map(aLatLng), estilo(p, false)).addTo(map);
       capa.feature = f;
-      capa.bindTooltip("L" + p.lote, { permanent: true, direction: "center", className: "lot-label", interactive: false });
+      capa.bindTooltip(String(p.lote), { permanent: true, direction: "center", className: "lot-label", interactive: false });
       capa.on("click", function (e) { L.DomEvent.stopPropagation(e); abrirLote(p.codigo); });
       var el = capa.getElement();
       if (el) { el.setAttribute("data-codigo", p.codigo); el.setAttribute("data-estado", p.estado); el.setAttribute("data-etapa", p.etapa); el.classList.add("lote"); }

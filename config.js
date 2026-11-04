@@ -6,14 +6,17 @@ window.MASTERPLAN_CONFIG = {
     nombre: "Paraíso del Este",
     subtitulo: "Masterplan interactivo · Santo Domingo Este",
     ubicacion: "Santo Domingo Este, República Dominicana",
-    logo: null,                 // ruta a imagen del proyecto, o null para usar logoTexto
+    logo: "assets/logo-paraiso-oscuro.png",      // versión para fondo oscuro (intro)
+    logoClaro: "assets/logo-paraiso.png",       // versión a color (encabezado claro)
+    fondoIntro: "assets/intro.jpg",
     logoTexto: "Paraíso del Este",
   },
 
   marca: {
     nombre: "PRAGMA CAPITAL",
-    logo: null,                 // null = wordmark de texto (los archivos de /logo recibidos dicen "Pragma Hormigones")
-    colores: { primario: "#0B3B33", secundario: "#003527", acento: "#C8A96A" },
+    logo: "assets/logo-pragma-oscuro.png",
+    logoClaro: "assets/logo-pragma.png",
+    colores: { primario: "#205810", secundario: "#123408", acento: "#70D860" },  // verdes del logo Paraíso del Este,
     fuente: "Inter",
   },
 
@@ -29,13 +32,16 @@ window.MASTERPLAN_CONFIG = {
     teselas: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     atribucion: "Imágenes © Esri, Maxar, Earthstar Geographics",
     maxZoomNativo: 19,
-    zoomEtiquetas: 18,          // a partir de este zoom se ven los códigos de lote
+    zoomEtiquetas: 18.5,
+    zoomManzanas: 16.5,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
   },
 
   datos: {
     lotes: "data/lots.geojson",            // geometría (tools/extraer_dxf.py)
     inventario: "data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
     amenidades: "data/amenidades.json",
+    manzanas: "data/manzanas.json",
+    limite: "data/limite.json",
     precios: "data/precios.json",          // solo se lee si mostrarPrecios = true (no existe en el sitio público)
     apiInventario: null,                   // futuro: endpoint de solo lectura de SIGI
   },
@@ -46,10 +52,10 @@ window.MASTERPLAN_CONFIG = {
   moneda: "RD$",
 
   estados: {
-    disponible:    { etiqueta: "Disponible",    color: "#16A34A" },
-    reservado:     { etiqueta: "Reservado",     color: "#F59E0B" },
-    vendido:       { etiqueta: "Vendido",       color: "#9CA3AF" },
-    no_disponible: { etiqueta: "No disponible", color: "#6B7280" },
+    disponible:    { etiqueta: "Disponible",    color: "#22E06B" },
+    reservado:     { etiqueta: "Reservado",     color: "#FBBF24" },
+    vendido:       { etiqueta: "Vendido",       color: "#35524D" },
+    no_disponible: { etiqueta: "No disponible", color: "#C9D1CF" },
   },
   // Estado que se asigna a lotes del plano que no están en el inventario (se marcan "ej").
   estadoSinInventario: "no_disponible",

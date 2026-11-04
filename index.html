@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Masterplan · Paraíso del Este</title>
 <meta name="description" content="Masterplan interactivo de Paraíso del Este: disponibilidad de lotes por etapa.">
-<meta name="theme-color" content="#003527">
+<meta name="theme-color" content="#123408">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="preload" as="image" href="assets/intro.jpg">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -23,8 +24,8 @@
     <button id="btnIngresar" class="btn btn--light btn--lg" type="button">Ingresar</button>
   </div>
   <div class="intro__foot">
-    <span class="intro__by">Desarrollado por</span>
-    <div id="introMarca" class="wordmark wordmark--light"></div>
+    <span class="intro__by">by</span>
+    <div id="introMarca" class="intro__marca"></div>
   </div>
 </section>
 
@@ -35,9 +36,10 @@
       <svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="topbar__title">
-      <strong id="tituloProyecto"></strong>
-      <span id="marcaMini" class="topbar__brand"></span>
+      <img id="logoTop" class="topbar__logo" alt="">
+      <strong id="tituloProyecto" class="sr-only"></strong>
     </div>
+    <div class="topbar__by"><span>by</span><img id="marcaMini" alt=""></div>
   </header>
   <nav id="filtros" class="chips" aria-label="Filtrar por estado"></nav>
   <nav id="filtrosEtapa" class="chips chips--etapa" aria-label="Filtrar por etapa"></nav>

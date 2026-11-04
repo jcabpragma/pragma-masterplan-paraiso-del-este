@@ -91,3 +91,12 @@ que el link de WhatsApp lleve el código del lote y que no aparezca «RD$» en l
 
 ## 7. Publicación
 Render Static Site conectado a este repo (rama `main`, publish path `.`, build `echo ok`). Cada push redeploya.
+
+## v2 (nov 2026): geometría regular y nueva imagen
+- **Geometría** (`tools/geometria_v2.py` → `tools/exportar_v2.py`): teselado regular por manzana a partir de las etiquetas del DXF
+  (eje por PCA, filas, franjas con fondo compartido, cortes perpendiculares en el punto medio entre etiquetas; tangente local en manzanas curvas).
+  Sin huecos ni solapes dentro de la manzana. Sigue siendo **aproximada**: las capas reales de lotes no están en el DXF (archivo truncado).
+  Se probó usar DS_1: solo 313 de 1379 etiquetas caen en una parcela de área ±10 % (es otro diseño), así que se descartó.
+  También genera `data/manzanas.json` (contornos) y `data/limite.json` (límite del proyecto).
+- **Marca**: logos en `assets/` (versión a color, `-oscuro` para fondos oscuros, `-blanco`). Paleta verde tomada del logo Paraíso del Este.
+- Flujo de actualización de geometría: `python3 tools/geometria_v2.py . && python3 tools/exportar_v2.py`.
