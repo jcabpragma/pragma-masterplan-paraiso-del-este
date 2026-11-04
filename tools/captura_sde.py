@@ -10,7 +10,7 @@ with sync_playwright() as p:
         pg.click("#btnIngresar"); pg.wait_for_selector("body[data-listo]"); pg.wait_for_timeout(2500)
         pg.screenshot(path=f"{out}/sde-{n}-plano.png")
         n_l=pg.evaluate("document.querySelectorAll('path.lote').length")
-        pg.evaluate("Masterplan.abrirLote('M5-L1')"); pg.wait_for_timeout(600)
+        pg.evaluate("Masterplan.abrirLote('E2-M5-L1')"); pg.wait_for_timeout(600)
         card=pg.inner_text("#card"); wa=pg.get_attribute("#btnWA","href")
         pg.screenshot(path=f"{out}/sde-{n}-tarjeta.png")
         pg.click(".topbar .proy-tab[href*='p=pde']"); pg.wait_for_selector("body[data-listo]"); pg.wait_for_timeout(1500)
