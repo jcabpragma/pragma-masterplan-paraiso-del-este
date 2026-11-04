@@ -85,6 +85,7 @@
     function etiquetas() {
       var z = map.getZoom(), c = map.getContainer();
       c.classList.toggle("sin-etiquetas", z < (CFG.plano.zoomEtiquetas || 18));
+      c.classList.toggle("sin-amenidades", z < (CFG.plano.zoomAmenidades || 0));
       c.classList.toggle("sin-manzanas", z < (CFG.plano.zoomManzanas || 16.5) || z >= (CFG.plano.zoomEtiquetas || 18));
     }
     map.on("zoomend", etiquetas); etiquetas();
@@ -314,7 +315,7 @@
       (p.tipologia && p.tipologia.length ? "<tr><td>Tipología</td><td>" + esc(p.tipologia.join(", ")) + "</td></tr>" : "") +
       filasPrecio + "</table>" +
       '<a class="btn btn--wa btn--block" href="' + linkWhatsApp(p.codigo) + '" target="_blank" rel="noopener">' + icoWA + "Escribir por WhatsApp</a>" +
-      '<p class="aviso-geo">Contorno del lote referencial. Medidas oficiales según plano aprobado.</p>';
+      (p.geometria === "real" ? "" : '<p class="aviso-geo">Contorno del lote referencial. Medidas oficiales según plano aprobado.</p>');
     $("#ficha").hidden = false;
   }
   $("#ficha").addEventListener("click", function (e) { if (e.target.hasAttribute("data-cerrar")) $("#ficha").hidden = true; });

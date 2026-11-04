@@ -218,3 +218,6 @@ path.lote{transition:fill-opacity .15s}
 .leaflet-nitido-pane{filter:contrast(1.04);will-change:clip-path}
 .leaflet-oculto-pane{filter:blur(16px) saturate(.6) brightness(.92)}
 .mz-label span{background:color-mix(in srgb,var(--secundario) 75%,transparent)}
+
+/* pines de amenidades solo desde CFG.plano.zoomAmenidades */
+.sin-amenidades .amenity-pin { display: none; }

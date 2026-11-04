@@ -34,6 +34,7 @@ window.MASTERPLAN_CONFIG = {
     atribucion: "Imágenes © Esri, Maxar, Earthstar Geographics",
     maxZoomNativo: 19,
     zoomEtiquetas: 18.5,
+    zoomAmenidades: 17,         // pines de áreas verdes (rótulos AV-PARQUE del DXF) desde este zoom
     zoomManzanas: 16.5,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
   },
 

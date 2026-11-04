@@ -30,6 +30,8 @@ Capas usadas:
 | `NOMBRES` (MTEXT) | Etiqueta de cada parcela: `01-05-3 / 224.15 / Habitacional / Etapa: 1` → código, m², uso, etapa. **1.379 lotes.** |
 | `DS_1` (bloque, Parcels Lines / textos) | Revisada: es otro trazado (zona norte/oeste) que no coincide con las etiquetas; no se usa para geometría. Sus rótulos (calles, «Paisaje», torres eléctricas) tampoco se usan como pines porque no están alineados con los lotes. |
 
+> **Reemplazado en v7** (ver al final): el DXF completo del 2026-11-04 trae los linderos reales.
+
 Las capas de polígonos de lote (`C-PROP-LOTS`, `Parcels Lines` del trazado actual) **no están en la parte legible del archivo**
 (se perdieron con el truncado). Por eso la geometría es **aproximada**: un rectángulo por lote centrado en la etiqueta
 (Civil 3D la ubica en el centroide), orientado según la fila de lotes de la misma manzana, ancho = separación entre
@@ -107,3 +109,22 @@ Render Static Site conectado a este repo (rama `main`, publish path `.`, build `
 - SDE (Samanes del Este): `proyectos/sde/data/` se generó del DXF de Samanes (293 rótulos `M##-L` en capa 0 + 313 polilíneas cerradas
   en capa 0 = contornos reales: 292/293 coinciden en área ±5 %; M16-L10 queda aproximado). UTM 19N → WGS84.
   Sin inventario aún: todos «No disponible · ej». Al llegar el CSV se genera `proyectos/sde/data/inventario.json` igual que PDE.
+
+## v7 (4 nov 2026): PDE con contornos reales
+- Entrada: DXF completo de Paraíso del Este (29,8 MB, termina en `EOF`, AutoCAD 2013, todo en capa `0`, metros, UTM 19N).
+- Script: `python3 tools/extraer_dxf_v3.py /ruta/plano_pde.dxf && python3 tools/merge_inventario.py /ruta/inventario_pde.csv pde`.
+  Reemplaza a `extraer_dxf.py` + `geometria_v2.py` + `exportar_v2.py` para PDE (se dejan como historial).
+- Método (igual que SDE, rótulo dentro de polígono): `polygonize` de LINE + LWPOLYLINE + ARC → 2.922 caras; cada uno de los
+  1.379 rótulos MTEXT toma la cara más pequeña que lo contiene, aceptada si el área = m² del rótulo ±5 %.
+  - **1.374** caras directas (área = m² con mediana 1,0000) + **1** cara partida por una línea ajena (E1-M3-L2, se une con su pedazo) → **1.375 reales**.
+  - **4 ajustadas**: E1-M1-L12/L13 y E1-M1-L14/L15 comparten cara (falta el lindero entre ellos en el DXF); se cortan paralelo
+    al lindero vecino en la posición que da el m² de cada rótulo. `geometria: "ajustada"` → la ficha muestra «Contorno referencial».
+  - 0 lotes sin contorno. Sin solapes, todos válidos. Mismo sitio que la capa anterior (desplazamiento mediano 0,15 m).
+- La ficha ya **no** muestra «Contorno del lote referencial» cuando `geometria === "real"` (aplica también a SDE: 292 reales, M16-L10 sigue con nota).
+- Límite: LWPOLYLINE cerrada de 51,4 ha del DXF (contiene los 1.379 rótulos) → `limite.json`; `mascara.json` = límite + 12 m
+  (recorte de la capa nítida; el entorno sigue con el difuminado claro).
+- Manzanas: unión de los lotes reales por etapa+manzana (66).
+- Amenidades: rótulos `AV-PARQUE nn` del DXF con ≥ 2.000 m² → 8 pines «Área verde». Se ven desde zoom 17
+  (`plano.zoomAmenidades`) para no tapar la vista general. AI-1/AI-3 y AA- no se usan (no está claro qué son). Calles: no se dibujan.
+- Inventario: 1.368 de 1.379 coinciden (sin cambio: los rótulos del DXF nuevo son los mismos). Siguen 11 solo en plano
+  («No disponible · ej») y 12 solo en SIGI; ver `privado/reporte_merge.json`.
