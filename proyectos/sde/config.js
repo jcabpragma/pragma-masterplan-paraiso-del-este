@@ -36,6 +36,16 @@ window.MASTERPLAN_CONFIG = {
     zoomManzanas: 16,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
   },
 
+  // Entorno fuera del límite. Para quitar el efecto: difuminado: false
+  entorno: { difuminado: true, intensidad: 1 },   // intensidad 0–1 (1 = desenfoque 2.5px, −20% color, −13% brillo)
+  // Zonas que se ocultan siempre con desenfoque fuerte, [[lat, lng], ...]. [] = ninguna
+  zonasOcultas: [
+    // galpones al sur de los lotes
+    [[19.1964, -70.4914], [19.1964, -70.4876], [19.1898, -70.4876], [19.1898, -70.4914]],
+    // galpones al este
+    [[19.2018, -70.4868], [19.2018, -70.4822], [19.1966, -70.4822], [19.1966, -70.4868]]
+  ],
+
   datos: {
     lotes: "proyectos/sde/data/lots.geojson",            // geometría (tools/extraer_dxf.py)
     inventario: "proyectos/sde/data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios

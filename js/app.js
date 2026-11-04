@@ -73,10 +73,12 @@
   function iniciarMapa() {
     map = L.map("map", { zoomControl: true, zoomSnap: 0.25, maxZoom: 21 });
     var opTes = { maxZoom: 21, maxNativeZoom: CFG.plano.maxZoomNativo || 19, attribution: CFG.plano.atribucion };
-    var conMascara = !!CFG.datos.mascara;   // fondo: con máscara se pide a baja resolución (z<=15) para que nada se reconozca al acercar
-    L.tileLayer(CFG.plano.teselas, conMascara ? L.extend({}, opTes, { maxNativeZoom: 14 }) : opTes).addTo(map);   // fondo (difuminado si hay máscara)
+    L.tileLayer(CFG.plano.teselas, opTes).addTo(map);   // fondo (entorno)
+    var ent = CFG.entorno || {}, k = ent.difuminado ? Math.max(0, Math.min(1, ent.intensidad == null ? 1 : ent.intensidad)) : 0;
+    // intensidad 1 = desenfoque 2.5px, 20% menos color, 13% más oscuro. difuminado:false = satélite normal.
+    map.getContainer().style.setProperty("--entorno-filtro", k ? "blur(" + (2.5 * k).toFixed(2) + "px) saturate(" + (1 - 0.2 * k).toFixed(2) + ") brightness(" + (1 - 0.13 * k).toFixed(2) + ")" : "none");
     map.createPane("nitido"); map.getPane("nitido").style.zIndex = 210; map.getPane("nitido").style.pointerEvents = "none";
-    map.createPane("vineta"); map.getPane("vineta").style.zIndex = 300; map.getPane("vineta").style.pointerEvents = "none";
+    map.createPane("oculto"); map.getPane("oculto").style.zIndex = 205; map.getPane("oculto").style.pointerEvents = "none";
     map.zoomControl.setPosition("bottomright");
     map.on("click", cerrarCard);
     map.createPane("manzanas"); map.getPane("manzanas").style.zIndex = 450; map.getPane("manzanas").style.pointerEvents = "none";
@@ -95,13 +97,14 @@
       CFG.mostrarPrecios ? getJSON(CFG.datos.precios).catch(function () { return null; }) : Promise.resolve(null),
       CFG.datos.manzanas ? getJSON(CFG.datos.manzanas).catch(function () { return null; }) : Promise.resolve(null),
       CFG.datos.limite ? getJSON(CFG.datos.limite).catch(function () { return null; }) : Promise.resolve(null),
-      CFG.datos.mascara ? getJSON(CFG.datos.mascara).catch(function () { return null; }) : Promise.resolve(null)
+      CFG.datos.mascara && (CFG.entorno || {}).difuminado ? getJSON(CFG.datos.mascara).catch(function () { return null; }) : Promise.resolve(null)
     ]).then(function (res) {
       lotes = res[0].features;
       precios = (res[4] && res[4].lotes) || {};
       mezclarInventario(res[3] || res[2]);
       encuadrar();
-      if (res[7]) aplicarMascara(res[7], opTes);      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
+      if (res[7] && k) aplicarMascara(res[7], opTes);
+      if ((CFG.zonasOcultas || []).length) zonasOcultas(CFG.zonasOcultas, opTes);      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
       if (res[6]) L.geoJSON(res[6], { interactive: false, style: { color: "#FFFFFF", weight: 2, opacity: 0.85, dashArray: "6 6", fill: false } }).addTo(map);
       if (res[5]) dibujarManzanas(res[5].features);
       dibujarLotes();
@@ -113,23 +116,28 @@
       alert("No se pudieron cargar los datos del plano. Abra el sitio con un servidor (ver README).");
     });
   }
-  // Fuera del proyecto: fondo difuminado + capa nítida recortada al límite + viñeta oscura con borde suave
-  function aplicarMascara(gj, opTes) {
-    var anillo = gj.geometry.coordinates[0].map(aLatLng);
-    L.tileLayer(CFG.plano.teselas, L.extend({ pane: "nitido", attribution: "" }, opTes)).addTo(map);
-    var pane = map.getPane("nitido");
-    function camino(fn) { return "path('M" + anillo.map(function (ll) { var p = fn(ll); return p.x.toFixed(1) + " " + p.y.toFixed(1); }).join("L") + "Z')"; }
-    function actualizar() { pane.style.transition = "none"; pane.style.clipPath = pane.style.webkitClipPath = camino(function (ll) { return map.latLngToLayerPoint(ll); }); }
+  // Recorte de una capa (o pane) a uno o varios anillos [LatLng], siguiendo pan, zoom y pinza
+  function recortar(el, anillos) {
+    function camino(fn) { return "path('" + anillos.map(function (a) { return "M" + a.map(function (ll) { var p = fn(ll); return p.x.toFixed(1) + " " + p.y.toFixed(1); }).join("L") + "Z"; }).join(" ") + "')"; }
+    function actualizar() { el.style.transition = "none"; el.style.clipPath = el.style.webkitClipPath = camino(function (ll) { return map.latLngToLayerPoint(ll); }); }
     map.on("move zoom viewreset zoomend moveend resize", actualizar);
-    map.on("zoomanim", function (e) {   // sigue la animación de zoom de Leaflet (misma curva y duración)
-      var c = camino(function (ll) { return map._latLngToNewLayerPoint(ll, e.zoom, e.center); });
-      pane.style.transition = "clip-path .25s cubic-bezier(0,0,.25,1), -webkit-clip-path .25s cubic-bezier(0,0,.25,1)";
-      pane.style.clipPath = pane.style.webkitClipPath = c;
+    map.on("zoomanim", function (e) {   // misma curva y duración que la animación de zoom de Leaflet
+      el.style.transition = "clip-path .25s cubic-bezier(0,0,.25,1), -webkit-clip-path .25s cubic-bezier(0,0,.25,1)";
+      el.style.clipPath = el.style.webkitClipPath = camino(function (ll) { return map._latLngToNewLayerPoint(ll, e.zoom, e.center); });
     });
     actualizar();
-    var mundo = [[-89, -179.9], [-89, 179.9], [89, 179.9], [89, -179.9]];
-    L.polygon([mundo, anillo], { renderer: L.svg({ pane: "vineta", padding: 1 }), interactive: false, stroke: true, color: "#000", weight: 26, opacity: 0.35, fillColor: "#000", fillOpacity: 0.42 }).addTo(map);
+  }
+  // Entorno: fondo suavizado (CSS --entorno-filtro) y capa nítida recortada al límite del proyecto
+  function aplicarMascara(gj, opTes) {
+    L.tileLayer(CFG.plano.teselas, L.extend({ pane: "nitido", attribution: "" }, opTes)).addTo(map);
+    recortar(map.getPane("nitido"), [gj.geometry.coordinates[0].map(aLatLng)]);
     map.getContainer().classList.add("con-mascara");
+  }
+  // Zonas ocultas: imagen de baja resolución (z<=14) muy difuminada solo dentro de esos polígonos.
+  // El recorte va en la capa y el desenfoque en el pane, así el borde queda suave.
+  function zonasOcultas(zonas, opTes) {
+    var capa = L.tileLayer(CFG.plano.teselas, L.extend({}, opTes, { pane: "oculto", attribution: "", maxNativeZoom: 14 })).addTo(map);
+    recortar(capa.getContainer(), zonas.map(function (z) { return z.map(function (c) { return L.latLng(c[0], c[1]); }); }));
   }
   // Vista inicial: todo el proyecto, también en celular
   function encuadrar() {

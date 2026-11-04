@@ -212,8 +212,8 @@ path.lote{transition:fill-opacity .15s}
   .intro__panel .proy-tabs--intro{position:absolute;left:50%;top:28px;transform:translateX(-50%)}
 }
 
-/* v5: fuera del plano difuminado */
-#map{background:#0b120a}
-.con-mascara .leaflet-tile-pane{filter:blur(18px) saturate(.25) brightness(.36)}
-.con-mascara .leaflet-nitido-pane{filter:saturate(.6) brightness(.7) contrast(1.05);will-change:clip-path}
-.leaflet-vineta-pane svg{filter:blur(10px)}
+/* v5: entorno (config: entorno.difuminado / intensidad / zonasOcultas) */
+#map{background:#1b2418}
+.leaflet-tile-pane{filter:var(--entorno-filtro,none)}
+.leaflet-nitido-pane{filter:contrast(1.04);will-change:clip-path}
+.leaflet-oculto-pane{filter:blur(16px) saturate(.6) brightness(.92)}

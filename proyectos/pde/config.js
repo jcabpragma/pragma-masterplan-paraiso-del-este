@@ -37,6 +37,11 @@ window.MASTERPLAN_CONFIG = {
     zoomManzanas: 16.5,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
   },
 
+  // Entorno fuera del límite. Para quitar el efecto: difuminado: false
+  entorno: { difuminado: true, intensidad: 1 },   // intensidad 0–1 (1 = desenfoque 2.5px, −20% color, −13% brillo)
+  // Zonas que se ocultan siempre con desenfoque fuerte, [[lat, lng], ...]. [] = ninguna
+  zonasOcultas: [],
+
   datos: {
     lotes: "proyectos/pde/data/lots.geojson",            // geometría (tools/extraer_dxf.py)
     inventario: "proyectos/pde/data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
