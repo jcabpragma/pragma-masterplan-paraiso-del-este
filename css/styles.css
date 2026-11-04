@@ -211,3 +211,9 @@ path.lote{transition:fill-opacity .15s}
 @media (min-aspect-ratio: 3/2) and (min-width: 701px){
   .intro__panel .proy-tabs--intro{position:absolute;left:50%;top:28px;transform:translateX(-50%)}
 }
+
+/* v5: fuera del plano difuminado */
+#map{background:#0b120a}
+.con-mascara .leaflet-tile-pane{filter:blur(18px) saturate(.25) brightness(.36)}
+.con-mascara .leaflet-nitido-pane{filter:saturate(.6) brightness(.7) contrast(1.05);will-change:clip-path}
+.leaflet-vineta-pane svg{filter:blur(10px)}

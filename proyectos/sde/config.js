@@ -31,7 +31,7 @@ window.MASTERPLAN_CONFIG = {
     modo: "geo",
     teselas: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     atribucion: "Imágenes © Esri, Maxar, Earthstar Geographics",
-    maxZoomNativo: 19,
+    maxZoomNativo: 18,
     zoomEtiquetas: 18,
     zoomManzanas: 16,         // a partir de este zoom se ven los números de manzana          // a partir de este zoom se ven los códigos de lote
   },
@@ -41,7 +41,7 @@ window.MASTERPLAN_CONFIG = {
     inventario: "proyectos/sde/data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
     amenidades: "proyectos/sde/data/amenidades.json",
     manzanas: "proyectos/sde/data/manzanas.json",
-    limite: "proyectos/sde/data/limite.json",
+    limite: "proyectos/sde/data/limite.json", mascara: "proyectos/sde/data/mascara.json",
     precios: "proyectos/sde/data/precios.json",          // solo se lee si mostrarPrecios = true (no existe en el sitio público)
     apiInventario: null,                   // futuro: endpoint de solo lectura de SIGI
   },

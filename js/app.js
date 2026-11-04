@@ -72,7 +72,11 @@
   // ---------- Mapa ----------
   function iniciarMapa() {
     map = L.map("map", { zoomControl: true, zoomSnap: 0.25, maxZoom: 21 });
-    L.tileLayer(CFG.plano.teselas, { maxZoom: 21, maxNativeZoom: CFG.plano.maxZoomNativo || 19, attribution: CFG.plano.atribucion }).addTo(map);
+    var opTes = { maxZoom: 21, maxNativeZoom: CFG.plano.maxZoomNativo || 19, attribution: CFG.plano.atribucion };
+    var conMascara = !!CFG.datos.mascara;   // fondo: con máscara se pide a baja resolución (z<=15) para que nada se reconozca al acercar
+    L.tileLayer(CFG.plano.teselas, conMascara ? L.extend({}, opTes, { maxNativeZoom: 14 }) : opTes).addTo(map);   // fondo (difuminado si hay máscara)
+    map.createPane("nitido"); map.getPane("nitido").style.zIndex = 210; map.getPane("nitido").style.pointerEvents = "none";
+    map.createPane("vineta"); map.getPane("vineta").style.zIndex = 300; map.getPane("vineta").style.pointerEvents = "none";
     map.zoomControl.setPosition("bottomright");
     map.on("click", cerrarCard);
     map.createPane("manzanas"); map.getPane("manzanas").style.zIndex = 450; map.getPane("manzanas").style.pointerEvents = "none";
@@ -90,12 +94,14 @@
       cargarInventarioVivo(),
       CFG.mostrarPrecios ? getJSON(CFG.datos.precios).catch(function () { return null; }) : Promise.resolve(null),
       CFG.datos.manzanas ? getJSON(CFG.datos.manzanas).catch(function () { return null; }) : Promise.resolve(null),
-      CFG.datos.limite ? getJSON(CFG.datos.limite).catch(function () { return null; }) : Promise.resolve(null)
+      CFG.datos.limite ? getJSON(CFG.datos.limite).catch(function () { return null; }) : Promise.resolve(null),
+      CFG.datos.mascara ? getJSON(CFG.datos.mascara).catch(function () { return null; }) : Promise.resolve(null)
     ]).then(function (res) {
       lotes = res[0].features;
       precios = (res[4] && res[4].lotes) || {};
       mezclarInventario(res[3] || res[2]);
-      encuadrar();      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
+      encuadrar();
+      if (res[7]) aplicarMascara(res[7], opTes);      // antes de dibujar: Leaflet crea los <path> solo cuando el mapa ya tiene vista
       if (res[6]) L.geoJSON(res[6], { interactive: false, style: { color: "#FFFFFF", weight: 2, opacity: 0.85, dashArray: "6 6", fill: false } }).addTo(map);
       if (res[5]) dibujarManzanas(res[5].features);
       dibujarLotes();
@@ -106,6 +112,24 @@
       console.error(e);
       alert("No se pudieron cargar los datos del plano. Abra el sitio con un servidor (ver README).");
     });
+  }
+  // Fuera del proyecto: fondo difuminado + capa nítida recortada al límite + viñeta oscura con borde suave
+  function aplicarMascara(gj, opTes) {
+    var anillo = gj.geometry.coordinates[0].map(aLatLng);
+    L.tileLayer(CFG.plano.teselas, L.extend({ pane: "nitido", attribution: "" }, opTes)).addTo(map);
+    var pane = map.getPane("nitido");
+    function camino(fn) { return "path('M" + anillo.map(function (ll) { var p = fn(ll); return p.x.toFixed(1) + " " + p.y.toFixed(1); }).join("L") + "Z')"; }
+    function actualizar() { pane.style.transition = "none"; pane.style.clipPath = pane.style.webkitClipPath = camino(function (ll) { return map.latLngToLayerPoint(ll); }); }
+    map.on("move zoom viewreset zoomend moveend resize", actualizar);
+    map.on("zoomanim", function (e) {   // sigue la animación de zoom de Leaflet (misma curva y duración)
+      var c = camino(function (ll) { return map._latLngToNewLayerPoint(ll, e.zoom, e.center); });
+      pane.style.transition = "clip-path .25s cubic-bezier(0,0,.25,1), -webkit-clip-path .25s cubic-bezier(0,0,.25,1)";
+      pane.style.clipPath = pane.style.webkitClipPath = c;
+    });
+    actualizar();
+    var mundo = [[-89, -179.9], [-89, 179.9], [89, 179.9], [89, -179.9]];
+    L.polygon([mundo, anillo], { renderer: L.svg({ pane: "vineta", padding: 1 }), interactive: false, stroke: true, color: "#000", weight: 26, opacity: 0.35, fillColor: "#000", fillOpacity: 0.42 }).addTo(map);
+    map.getContainer().classList.add("con-mascara");
   }
   // Vista inicial: todo el proyecto, también en celular
   function encuadrar() {

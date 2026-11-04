@@ -42,7 +42,7 @@ window.MASTERPLAN_CONFIG = {
     inventario: "proyectos/pde/data/inventario.json",    // estado / m² / tipología (tools/merge_inventario.py) — SIN precios
     amenidades: "proyectos/pde/data/amenidades.json",
     manzanas: "proyectos/pde/data/manzanas.json",
-    limite: "proyectos/pde/data/limite.json",
+    limite: "proyectos/pde/data/limite.json", mascara: "proyectos/pde/data/mascara.json",
     precios: "proyectos/pde/data/precios.json",          // solo se lee si mostrarPrecios = true (no existe en el sitio público)
     apiInventario: null,                   // futuro: endpoint de solo lectura de SIGI
   },
