@@ -162,3 +162,27 @@ path.lote{transition:fill-opacity .15s}
 .precio-consulta{font-size:14px!important;color:#205810!important}
 .tag{background:#EEF5EA!important;color:#205810!important}
 .btn--ghost{background:#EEF5EA;color:#205810}
+
+/* ================= v3 · entrada con foto ================= */
+.intro{background:#0E2408;padding:0;justify-content:flex-start;gap:0}
+.intro::after{display:none}
+.intro__blur{position:absolute;inset:-40px;background:url("../assets/entrada-blur.jpg") center/cover;filter:blur(24px) brightness(.6) saturate(1.2);transform:scale(1.15);z-index:0}
+.intro__foto{position:relative;z-index:1;display:block;width:100%;margin-top:max(56px,12vh)}
+.intro__foto img{display:block;width:100%;height:auto;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.intro__panel{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:26px;margin:auto 0;padding:28px 24px calc(32px + env(safe-area-inset-bottom))}
+.intro__logo img{width:min(74vw,320px)}
+/* Escritorio / horizontal ancho: foto a pantalla completa (el texto y logo de la foto quedan en el centro 70 % x 45 %) */
+@media (min-aspect-ratio: 3/2) and (min-width: 701px){
+  .intro__blur{display:none}
+  .intro__foto{position:absolute;inset:0;margin:0}
+  .intro__foto img{width:100%;height:100%;object-fit:cover;object-position:center;box-shadow:none}
+  .intro__panel{position:absolute;inset:0;margin:0;padding:28px 36px;flex-direction:row;justify-content:space-between;align-items:flex-start;pointer-events:none;
+    background:linear-gradient(180deg,rgba(8,20,4,.55) 0%,rgba(8,20,4,0) 22%,rgba(8,20,4,0) 78%,rgba(8,20,4,.5) 100%)}
+  .intro__logo img{width:clamp(240px,22vw,340px)}
+  #btnIngresar{pointer-events:auto;align-self:flex-end;min-width:200px}
+}
+/* Escritorio más cuadrado: foto completa centrada sobre fondo difuminado */
+@media (max-aspect-ratio: 3/2) and (min-width: 701px){
+  .intro__foto{width:min(100%,1100px,calc((100vh - 280px) * 16 / 9));margin:48px auto 0}
+  .intro__foto img{border-radius:14px}
+}

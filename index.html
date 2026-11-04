@@ -10,22 +10,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-<link rel="preload" as="image" href="assets/intro.jpg">
+<link rel="preload" as="image" href="assets/entrada-movil.webp" media="(max-width: 700px)">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <!-- Pantalla de entrada -->
 <section id="intro" class="intro" aria-label="Bienvenida">
-  <div id="introUbic" class="intro__badge intro__badge--ubic"></div>
-  <div class="intro__center">
+  <div class="intro__blur" aria-hidden="true"></div>
+  <picture class="intro__foto">
+    <source media="(max-width: 700px)" srcset="assets/entrada-movil.webp" type="image/webp">
+    <source srcset="assets/entrada.webp" type="image/webp">
+    <img src="assets/entrada.jpg" alt="Built with vision, operated with innovation! — Pragma Capital" width="1920" height="1080">
+  </picture>
+  <div class="intro__panel">
     <div id="introLogo" class="intro__logo"></div>
-    <p id="introSub" class="intro__sub"></p>
     <button id="btnIngresar" class="btn btn--light btn--lg" type="button">Ingresar</button>
-  </div>
-  <div class="intro__foot">
-    <span class="intro__by">by</span>
-    <div id="introMarca" class="intro__marca"></div>
   </div>
 </section>
 

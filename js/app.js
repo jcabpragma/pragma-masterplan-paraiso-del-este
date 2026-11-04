@@ -35,10 +35,6 @@
   $("#introLogo").innerHTML = CFG.proyecto.logo
     ? '<img src="' + esc(CFG.proyecto.logo) + '" alt="' + esc(CFG.proyecto.nombre) + '">'
     : esc(CFG.proyecto.logoTexto);
-  if (CFG.proyecto.fondoIntro) $("#intro").style.setProperty("--fondo-intro", 'url("' + CFG.proyecto.fondoIntro + '")');
-  $("#introSub").textContent = CFG.proyecto.subtitulo;
-  $("#introUbic").textContent = CFG.proyecto.ubicacion;
-  $("#introMarca").innerHTML = wordmark();
   $("#tituloProyecto").textContent = CFG.proyecto.nombre;
   $("#marcaMini").src = CFG.marca.logoClaro || CFG.marca.logo; $("#marcaMini").alt = CFG.marca.nombre;
   $("#logoTop").src = CFG.proyecto.logoClaro || CFG.proyecto.logo; $("#logoTop").alt = CFG.proyecto.nombre;
