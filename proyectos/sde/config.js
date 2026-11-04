@@ -8,7 +8,9 @@ window.MASTERPLAN_CONFIG = {
     nombre: "Samanes del Este",
     subtitulo: "",
     ubicacion: "",
-    logo: null, logoClaro: null,               // sin logo todavía: wordmark de texto
+    logo: "proyectos/sde/logo-samanes-oscuro.png",     // sobre fondo oscuro (entrada)
+    logoClaro: "proyectos/sde/logo-samanes.png",      // sobre fondo claro (encabezado)
+    logoBlanco: "proyectos/sde/logo-samanes-blanco.png",
     logoTexto: "Samanes del Este",
   },
 
@@ -16,7 +18,7 @@ window.MASTERPLAN_CONFIG = {
     nombre: "PRAGMA CAPITAL",
     logo: "assets/logo-pragma-oscuro.png",
     logoClaro: "assets/logo-pragma.png",
-    colores: { primario: "#205810", secundario: "#123408", acento: "#70D860" },  // misma paleta Pragma/PDE
+    colores: { primario: "#3A6E9E", secundario: "#1F4468", acento: "#84ACD4" },  // azul del logo Samanes (#84ACD4); primario oscurecido para texto blanco
     fuente: "Inter",
   },
 
