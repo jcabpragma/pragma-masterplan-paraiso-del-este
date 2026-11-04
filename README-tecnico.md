@@ -92,7 +92,10 @@ Móvil 390×844 (entrada, plano completo, tap real en un lote, ficha, filtro eta
 que el link de WhatsApp lleve el código del lote y que no aparezca «RD$» en la página.
 
 ## 7. Publicación
-Render Static Site conectado a este repo (rama `main`, publish path `.`, build `echo ok`). Cada push redeploya.
+Render Static Site conectado a este repo (rama `main`, publish path `./`, build `echo ok`), workspace `tea-db12i3u0tbcc73977f50`.
+- **Link oficial (desde 4 nov 2026): https://pragma-masterplan-proyectos.onrender.com** — servicio `srv-dblmi2d6e07s739c4i70` (`pragma-masterplan-proyectos`). PDE: `?p=pde`, SDE: `?p=sde`; `&ver=plano` salta la portada.
+- Link anterior (sigue activo, mismo repo): https://pragma-masterplan-paraiso-del-este.onrender.com — servicio `srv-dbl8qd942hec739v9skg`. El subdominio onrender no se puede renombrar; por eso se creó un servicio nuevo. No se ha borrado ni suspendido.
+- El auto-deploy al hacer push no siempre dispara: después de cada push, lanzar deploy manual en ambos servicios (Render MCP `trigger_deploy` o el dashboard) y comprobar el archivo cambiado con `?cb=` en el link.
 
 ## v2 (nov 2026): geometría regular y nueva imagen
 - **Geometría** (`tools/geometria_v2.py` → `tools/exportar_v2.py`): teselado regular por manzana a partir de las etiquetas del DXF
